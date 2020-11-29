@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-mpnj/categories"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/go-rel/rel"
@@ -57,6 +58,28 @@ func (c Categories) Create(w http.ResponseWriter, r *http.Request) {
 	render(w, category, 201)
 }
 
+// Update ...
+func (c Categories) Update(w http.ResponseWriter, r *http.Request) {
+	var (
+		ctx      = r.Context()
+		category categories.Category
+		id, _    = strconv.Atoi(chi.URLParam(r, "ID"))
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
+		logger.Warn("decode error", zap.Error(err))
+		render(w, ErrBadRequest, 400)
+		return
+	}
+
+	if err := c.categories.Update(ctx, &category, id); err != nil {
+		render(w, err, 422)
+		return
+	}
+
+	render(w, category, 200)
+}
+
 // NewCategories ...
 func NewCategories(repository rel.Repository, categories categories.Service) Categories {
 	handler := Categories{
@@ -66,6 +89,7 @@ func NewCategories(repository rel.Repository, categories categories.Service) Cat
 
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
+	handler.Put("/{ID}", handler.Update)
 
 	return handler
 }
