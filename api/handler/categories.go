@@ -62,8 +62,8 @@ func (c Categories) Create(w http.ResponseWriter, r *http.Request) {
 func (c Categories) Update(w http.ResponseWriter, r *http.Request) {
 	var (
 		ctx      = r.Context()
-		category categories.Category
-		id, _    = strconv.Atoi(chi.URLParam(r, "ID"))
+		category = ctx.Value(loadKey).(categories.Category)
+		changes  = rel.NewChangeset(&category)
 	)
 
 	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
@@ -72,7 +72,7 @@ func (c Categories) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := c.categories.Update(ctx, &category, id); err != nil {
+	if err := c.categories.Update(ctx, &category, changes); err != nil {
 		render(w, err, 422)
 		return
 	}
