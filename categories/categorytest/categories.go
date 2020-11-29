@@ -45,3 +45,13 @@ func MockDelete() MockFunc {
 		service.On("Delete", mock.Anything, mock.Anything)
 	}
 }
+
+// MockUpdate ...
+func MockUpdate(result categories.Category, err error) MockFunc {
+	return func(service *Service) {
+		service.On("Update", mock.Anything, mock.Anything).Return(func(ctx context.Context, output *categories.Category) error {
+			*output = result
+			return err
+		})
+	}
+}
