@@ -38,3 +38,10 @@ func MockCreate(result categories.Category, err error) MockFunc {
 		})
 	}
 }
+
+// MockDelete ...
+func MockDelete() MockFunc {
+	return func(service *Service) {
+		service.On("Delete", mock.Anything, mock.Anything)
+	}
+}
