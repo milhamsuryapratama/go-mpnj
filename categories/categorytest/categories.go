@@ -28,3 +28,13 @@ func MockGet(result []categories.Category, err error) MockFunc {
 		})
 	}
 }
+
+// MockCreate ...
+func MockCreate(result categories.Category, err error) MockFunc {
+	return func(service *Service) {
+		service.On("Create", mock.Anything, mock.Anything).Return(func(ctx context.Context, output *categories.Category) error {
+			*output = result
+			return err
+		})
+	}
+}
