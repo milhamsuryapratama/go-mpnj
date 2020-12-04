@@ -1,7 +1,6 @@
 package products
 
 import (
-	"go-mpnj/categories"
 	"time"
 )
 
@@ -20,6 +19,6 @@ type Product struct {
 	Sold         int                  `json:"sold"`
 	CreatedAt    time.Time            `json:"created_at"`
 	UpdatedAt    time.Time            `json:"updated_at"`
-	Category     categories.Category `json:"category" ref:"category_id" fk:"id"`
+	//Category     categories.Category `json:"category" db:"-" ref:"category_id" fk:"id"`
 	CategoryID   int                  `json:"category_id"`
 }
