@@ -121,7 +121,7 @@ func NewProducts(products products.Service) Products {
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
 	handler.With(handler.Load).Delete("/{ID}", handler.Destroy)
-	handler.Put("/{ID}", handler.Update)
+	handler.With(handler.Load).Put("/{ID}", handler.Update)
 
 	return handler
 }
