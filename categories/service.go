@@ -17,6 +17,7 @@ type Service interface {
 	Create(ctx context.Context, category *Category) error
 	Update(ctx context.Context, category *Category, changes rel.Changeset) error
 	Delete(ctx context.Context, id int) error
+	FindByID(ctx context.Context, category *Category, id uint) error
 }
 
 type service struct {
@@ -24,6 +25,7 @@ type service struct {
 	create
 	update
 	delete
+	findByID
 }
 
 var _ Service = (*service)(nil)
@@ -35,5 +37,6 @@ func New(repository rel.Repository) Service {
 		create: create{repository: repository},
 		update: update{repository: repository},
 		delete: delete{repository: repository},
+		findByID: findByID{repository: repository},
 	}
 }
