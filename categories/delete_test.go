@@ -2,7 +2,6 @@ package categories
 
 import (
 	"context"
-	"strconv"
 	"testing"
 
 	"github.com/go-rel/rel/reltest"
@@ -15,17 +14,16 @@ func TestDelete(t *testing.T) {
 		ctx        = context.TODO()
 		repository = reltest.New()
 		service    = New(repository)
-		category   = Category{ID: "1", CategoryName: "Makanan"}
-		id, _      = strconv.Atoi(category.ID)
+		category   = Category{ID: 1, CategoryName: "Makanan"}
 	)
 
 	repository.ExpectFind(
-		where.Eq("id", id),
+		where.Eq("id", category.ID),
 	).Result(category)
 	repository.ExpectDelete().For(&category)
 
 	assert.NotPanics(t, func() {
-		service.Delete(ctx, id)
+		service.Delete(ctx, category.ID)
 	})
 
 	repository.AssertExpectations(t)

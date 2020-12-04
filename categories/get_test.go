@@ -14,7 +14,7 @@ func TestGet(t *testing.T) {
 		repository = reltest.New()
 		service    = New(repository)
 		categories []Category
-		result     = []Category{{ID: "1", CategoryName: "Makanan"}}
+		result     = []Category{{ID: 1, CategoryName: "Makanan"}}
 	)
 
 	repository.ExpectFindAll().Result(result)

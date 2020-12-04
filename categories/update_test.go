@@ -15,7 +15,7 @@ func TestUpdate(t *testing.T) {
 		ctx        = context.TODO()
 		repository = reltest.New()
 		service    = New(repository)
-		category   = Category{ID: "1", CategoryName: "Makanan"}
+		category   = Category{ID: 1, CategoryName: "Makanan"}
 		changes    = rel.NewChangeset(&category)
 	)
 

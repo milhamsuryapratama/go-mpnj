@@ -17,10 +17,11 @@ var (
 
 // Category ...
 type Category struct {
-	ID           string    `json:"id"`
+	ID           int       `json:"id"`
 	CategoryName string    `json:"category_name"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+	//Products     []products.Product `ref:"id" fk:"category_id"`
 }
 
 // Validate ...
