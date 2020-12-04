@@ -16,6 +16,7 @@ type Service interface {
 	Get(ctx context.Context, products *[]Product) error
 	Create(ctx context.Context, product *Product) error
 	Delete(ctx context.Context, id int) error
+	FindByID(ctx context.Context, product *Product ,id uint) error
 }
 
 type service struct {
@@ -32,5 +33,6 @@ func New(repository rel.Repository) Service {
 		get:    get{repository: repository},
 		create: create{repository: repository},
 		delete: delete{repository: repository},
+		findByID: findByID{repository: repository},
 	}
 }

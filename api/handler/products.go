@@ -64,6 +64,50 @@ func (p Products) Destroy(w http.ResponseWriter, r *http.Request) {
 	render(w, nil, 204)
 }
 
+func (p Products) Update(w http.ResponseWriter, r *http.Request) {
+	var (
+		ctx 	= r.Context()
+		product = ctx.Value(loadKey).(products.Product)
+		changes = rel.NewChangeset(&product)
+	)
+
+	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
+		logger.Warn("decode error", zap.Error(err))
+		render(w, ErrBadRequest, 400)
+		return
+	}
+
+	if err := p.products.Update(ctx, &product, changes); err != nil {
+		render(w, err, 422)
+		return
+	}
+
+	render(w, product, 200)
+}
+
+func (p Products) Load(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var (
+			ctx = r.Context()
+			id, _ = strconv.Atoi(chi.URLParam(r, "ID"))
+			product products.Product
+		)
+
+		err := p.products.FindByID(ctx, &product, uint(id))
+		if err != nil {
+			if errors.Is(err, rel.ErrNotFound) {
+				render(w, err, 404)
+				return
+			}
+
+			panic(err)
+		}
+
+		ctx = context.WithValue(ctx, loadKey, product)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 // NewProducts ...
 func NewProducts(products products.Service) Products {
 	handler := Products{
@@ -73,7 +117,8 @@ func NewProducts(products products.Service) Products {
 
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
-	handler.Delete("/{ID}", handler.Destroy)
+	handler.With(handler.Load).Delete("/{ID}", handler.Destroy)
+	handler.Put("/{ID}", handler.Update)
 
 	return handler
 }
