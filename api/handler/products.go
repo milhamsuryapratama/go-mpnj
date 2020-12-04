@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/go-rel/rel"
 	"go-mpnj/products"
 	"net/http"
 	"strconv"
@@ -53,10 +56,10 @@ func (p Products) Create(w http.ResponseWriter, r *http.Request) {
 func (p Products) Destroy(w http.ResponseWriter, r *http.Request) {
 	var (
 		ctx = r.Context()
-		id, _ = strconv.Atoi(chi.URLParam(r,"ID"))
+		product = ctx.Value(loadKey).(products.Product)
 	)
 
-	if err := p.products.Delete(ctx, id); err != nil {
+	if err := p.products.Delete(ctx, &product); err != nil {
 		render(w, ErrBadRequest, 400)
 		return
 	}

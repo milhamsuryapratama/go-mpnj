@@ -23,6 +23,7 @@ type service struct {
 	get
 	create
 	delete
+	findByID
 }
 
 var _ Service = (*service)(nil)
