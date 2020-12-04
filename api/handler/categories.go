@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go-mpnj/categories"
 	"net/http"
@@ -80,6 +82,28 @@ func (c Categories) Update(w http.ResponseWriter, r *http.Request) {
 	render(w, category, 200)
 }
 
+func (c Categories) Load(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var (
+			ctx 	= r.Context()
+			id, _ 	= strconv.Atoi(chi.URLParam(r, "ID"))
+			category categories.Category
+		)
+
+		err := c.categories.FindByID(ctx, &category, uint(id))
+		if err != nil {
+			if errors.Is(err, rel.ErrNotFound) {
+				render(w, err, 404)
+				return
+			}
+			panic(err)
+		}
+
+		ctx = context.WithValue(ctx, loadKey, category)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 // Destroy ...
 func (c Categories) Destroy(w http.ResponseWriter, r *http.Request) {
 	var (
@@ -104,7 +128,7 @@ func NewCategories(repository rel.Repository, categories categories.Service) Cat
 
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
-	handler.Put("/{ID}", handler.Update)
+	handler.With(handler.Load).Put("/{ID}", handler.Update)
 	handler.Delete("/{ID}", handler.Destroy)
 
 	return handler
