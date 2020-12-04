@@ -82,6 +82,21 @@ func (c Categories) Update(w http.ResponseWriter, r *http.Request) {
 	render(w, category, 200)
 }
 
+// Destroy ...
+func (c Categories) Destroy(w http.ResponseWriter, r *http.Request) {
+	var (
+		ctx   = r.Context()
+		category = ctx.Value(loadKey).(categories.Category)
+	)
+
+	if err := c.categories.Delete(ctx, &category); err != nil {
+		render(w, ErrBadRequest, 400)
+		return
+	}
+
+	render(w, nil, 204)
+}
+
 func (c Categories) Load(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (
@@ -104,21 +119,6 @@ func (c Categories) Load(next http.Handler) http.Handler {
 	})
 }
 
-// Destroy ...
-func (c Categories) Destroy(w http.ResponseWriter, r *http.Request) {
-	var (
-		ctx   = r.Context()
-		id, _ = strconv.Atoi(chi.URLParam(r, "ID"))
-	)
-
-	if err := c.categories.Delete(ctx, id); err != nil {
-		render(w, ErrBadRequest, 400)
-		return
-	}
-
-	render(w, nil, 204)
-}
-
 // NewCategories ...
 func NewCategories(repository rel.Repository, categories categories.Service) Categories {
 	handler := Categories{
@@ -129,7 +129,7 @@ func NewCategories(repository rel.Repository, categories categories.Service) Cat
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
 	handler.With(handler.Load).Put("/{ID}", handler.Update)
-	handler.Delete("/{ID}", handler.Destroy)
+	handler.With(handler.Load).Delete("/{ID}", handler.Destroy)
 
 	return handler
 }

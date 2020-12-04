@@ -16,7 +16,7 @@ type Service interface {
 	Get(ctx context.Context, category *[]Category) error
 	Create(ctx context.Context, category *Category) error
 	Update(ctx context.Context, category *Category, changes rel.Changeset) error
-	Delete(ctx context.Context, id int) error
+	Delete(ctx context.Context, category *Category) error
 	FindByID(ctx context.Context, category *Category, id uint) error
 }
 
