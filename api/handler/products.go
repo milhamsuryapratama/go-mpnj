@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go-mpnj/products"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
@@ -49,6 +50,20 @@ func (p Products) Create(w http.ResponseWriter, r *http.Request) {
 	render(w, product, 201)
 }
 
+func (p Products) Destroy(w http.ResponseWriter, r *http.Request) {
+	var (
+		ctx = r.Context()
+		id, _ = strconv.Atoi(chi.URLParam(r,"ID"))
+	)
+
+	if err := p.products.Delete(ctx, id); err != nil {
+		render(w, ErrBadRequest, 400)
+		return
+	}
+
+	render(w, nil, 204)
+}
+
 // NewProducts ...
 func NewProducts(products products.Service) Products {
 	handler := Products{
@@ -58,6 +73,7 @@ func NewProducts(products products.Service) Products {
 
 	handler.Get("/", handler.Index)
 	handler.Post("/", handler.Create)
+	handler.Delete("/{ID}", handler.Destroy)
 
 	return handler
 }
