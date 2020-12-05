@@ -15,7 +15,7 @@ func NewMux(repository rel.Repository) *chi.Mux {
 		mux               = chi.NewMux()
 		categories        = categories.New(repository)
 		products          = products.New(repository)
-		categoriesHandler = handler.NewCategories(repository, categories)
+		categoriesHandler = handler.NewCategories(categories)
 		productsHandler   = handler.NewProducts(products)
 	)
 

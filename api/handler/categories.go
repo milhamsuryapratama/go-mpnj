@@ -120,7 +120,7 @@ func (c Categories) Load(next http.Handler) http.Handler {
 }
 
 // NewCategories ...
-func NewCategories(repository rel.Repository, categories categories.Service) Categories {
+func NewCategories(categories categories.Service) Categories {
 	handler := Categories{
 		Mux:        chi.NewMux(),
 		categories: categories,
