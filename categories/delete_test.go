@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/go-rel/rel/reltest"
-	"github.com/go-rel/rel/where"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,13 +16,10 @@ func TestDelete(t *testing.T) {
 		category   = Category{ID: 1, CategoryName: "Makanan"}
 	)
 
-	repository.ExpectFind(
-		where.Eq("id", category.ID),
-	).Result(category)
-	repository.ExpectDelete().For(&category)
+	repository.ExpectDelete().ForType("categories.Category")
 
 	assert.NotPanics(t, func() {
-		service.Delete(ctx, category.ID)
+		service.Delete(ctx, &category)
 	})
 
 	repository.AssertExpectations(t)
